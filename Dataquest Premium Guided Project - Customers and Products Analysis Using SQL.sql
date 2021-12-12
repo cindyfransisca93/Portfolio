@@ -3,6 +3,7 @@ Dataquest Premium Guided Project: Customers and Products Analysis Using SQL
 Goal: To analyze data from a sales records database ('stores' db) for a hypothetical cars company and extract information for decision-making.
 
 Skills used: Joins, CTE's, Aggregate Functions
+Code written in SQLite
 */
 
 -- 1. Create a file named 'project.sql' where you can write all the project queries.
@@ -175,20 +176,20 @@ customers_by_month_table AS (
 ),
 
 new_customers_by_month_table AS (
-SELECT p1.year_month, 
-       COUNT(*) AS number_of_new_customers,
-       SUM(p1.amount) AS new_customer_sales_total,
-       (SELECT number_of_customers
-          FROM customers_by_month_table c
-        WHERE c.year_month = p1.year_month) AS number_of_customers,
-       (SELECT total
-          FROM customers_by_month_table c
-         WHERE c.year_month = p1.year_month) AS sales_total
-  FROM payment_with_year_month_table p1
- WHERE p1.customerNumber NOT IN (SELECT customerNumber
-                                   FROM payment_with_year_month_table p2
-                                  WHERE p2.year_month < p1.year_month)
- GROUP BY p1.year_month
+	SELECT p1.year_month, 
+	       COUNT(*) AS number_of_new_customers,
+	       SUM(p1.amount) AS new_customer_sales_total,
+	       (SELECT number_of_customers
+		  FROM customers_by_month_table c
+		WHERE c.year_month = p1.year_month) AS number_of_customers,
+	       (SELECT total
+		  FROM customers_by_month_table c
+		 WHERE c.year_month = p1.year_month) AS sales_total
+	  FROM payment_with_year_month_table p1
+	 WHERE p1.customerNumber NOT IN (SELECT customerNumber
+					   FROM payment_with_year_month_table p2
+					  WHERE p2.year_month < p1.year_month)
+	 GROUP BY p1.year_month
 )
 
 -- Display how many new customers & how much sales came from new customers, against total customers & total sales, on a monthly basis
