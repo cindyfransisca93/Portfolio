@@ -10,14 +10,16 @@ Code written in SQLite
 
 -- 2. Provide a brief description of what each table contains.
 
--- 'customers' : contact information of registered customers
--- 'employees' : contact information & reporting line of registered employees
--- 'offices' : location information of registered office branches
--- 'orders' : date and status of registered orders placed by customers 
--- 'orderdetails' : product information of registered orders placed by customers 
--- 'payments' : amount, dates, and customer information of registered payments made to the company
--- 'products' : product information and origin details of the inventory 
--- 'productlines' : description and image of product categories
+/* 
+'customers' : contact information of registered customers
+'employees' : contact information & reporting line of registered employees
+'offices' : location information of registered office branches
+'orders' : date and status of registered orders placed by customers 
+'orderdetails' : product information of registered orders placed by customers 
+'payments' : amount, dates, and customer information of registered payments made to the company
+'products' : product information and origin details of the inventory 
+'productlines' : description and image of product categories
+*/
 
 -- 3. Display the name, num of columns, and num of rows of each table in the 'stores' schema.
 
@@ -72,15 +74,18 @@ prod_perf AS (
 		   LIMIT 10
 ),
 
--- Note: the guided project specifically uses the 'low stock' criteria defined as the 10 products with the lowest SUM(quantityOrdered)/quantityInStock.
--- My personal opinion says that,
--- a) although a company is assumed to be free to define the metric as they wish, the 'ordered/instock' approach is a less intuitive metric
--- especially when the ultimate goal is said to "prevent the best-selling products from going out-of-stock."
--- my preferred definition is "the 10 lowest of instock/AVG(quantityOrdered)"
--- because I believe frequency/timing plays a big factor in inventory decisions--priority should be given to products more likely to go out of stock in the next few immediate orders
--- b) even if we agree with the metrics, the use of '10 lowest' is a mismatch of solution, as it is more appropriate to use 10 highest.  
+/* 
+Note: the guided project specifically uses the 'low stock' criteria defined as the 10 products with the lowest SUM(quantityOrdered)/quantityInStock.
 
--- For the purpose of this project I will go with the 10 products with the highest SUM(quantityOrdered)/quantityInStock
+My personal opinion is that,
+a) although a company is assumed to be free to define the metric as they wish, the 'ordered/instock' approach is a less intuitive metric 
+especially when the ultimate goal is said to "prevent the best-selling products from going out-of-stock."
+my preferred definition is "the 10 lowest of instock/AVG(quantityOrdered)"
+because I believe frequency/timing plays a big factor in inventory decisions--priority should be given to products more likely to go out of stock in the next few immediate orders
+b) even if we agree with the metrics, the use of '10 lowest' is a mismatch of solution, as it is more appropriate to use 10 highest.  
+
+For the purpose of this project I will go with the 10 products with the highest SUM(quantityOrdered)/quantityInStock
+*/
 
 low_stock AS (
 		  SELECT pp.productCode,
@@ -206,15 +211,17 @@ new_customers_by_month_table AS (
 SELECT AVG(profit) as avg_profit
   FROM cust_profit cp
   
--- Conclusion:
+/* Conclusion:
 
--- Q4's list suggests that classic cars are profitable products with high turnover, which should be prioritized for restocking 
+Q4's list suggests that classic cars are profitable products with high turnover, which should be prioritized for restocking 
 
--- Q5's list of VIP customers and least engaged customers may suggest a different approach & goal to the Marketing department.
--- VIP customers are likely to be receptive to campaigns aiming to boost loyalty & find upsell opportunities,
--- whereas least engaged customers are least likely to place repeat orders and may switch to competitors, due to finding lack of value from the partnership.
+Q5's list of VIP customers and least engaged customers may suggest a different approach & goal to the Marketing department.
+VIP customers are likely to be receptive to campaigns aiming to boost loyalty & find upsell opportunities,
+whereas least engaged customers are least likely to place repeat orders and may switch to competitors, due to finding lack of value from the partnership.
 
--- Q6's pct_number_of_new_customers and pct_new_customers_sales_total suggest that the company has not brought in new customer since Dec 2004 
--- and that new customers make up less and less proportion in terms of number of customers and product sales.
--- If we decide to launch a program on acquiring new customers, the cost of our customer acquisition should be benchmarked against the LTV, 
--- which is suggested to be $ 39,039.6 in average.
+Q6's pct_number_of_new_customers and pct_new_customers_sales_total suggest that the company has not brought in new customer since Dec 2004 
+and that new customers make up less and less proportion in terms of number of customers and product sales.
+If we decide to launch a program on acquiring new customers, the cost of our customer acquisition should be benchmarked against the LTV, 
+which is suggested to be $ 39,039.6 in average.
+
+/*
