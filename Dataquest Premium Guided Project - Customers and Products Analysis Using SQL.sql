@@ -5,9 +5,9 @@ Goal: To analyze data from a sales records database ('stores' db) for a hypothet
 Skills used: Joins, CTE's, Aggregate Functions
 */
 
--- Create a file named 'project.sql' where you can write all the project queries.
+-- 1. Create a file named 'project.sql' where you can write all the project queries.
 
--- Provide a brief description of what each table contains.
+-- 2. Provide a brief description of what each table contains.
 
 -- 'customers' : contact information of registered customers
 -- 'employees' : contact information & reporting line of registered employees
@@ -18,7 +18,7 @@ Skills used: Joins, CTE's, Aggregate Functions
 -- 'products' : product information and origin details of the inventory 
 -- 'productlines' : description and image of product categories
 
--- Display the name, num of columns, and num of rows of each table in the 'stores' schema.
+-- 3. Display the name, num of columns, and num of rows of each table in the 'stores' schema.
 
 WITH
 row_count AS (
@@ -44,16 +44,16 @@ row_count AS (
 		FROM products
 )
 
-				  SELECT m.name AS table_name, 
-					             COUNT(*) AS number_of_attributes,
-						          r.number_of_rows
-					  FROM sqlite_master m
+	 SELECT m.name AS table_name, 
+	        COUNT(*) AS number_of_attributes,
+	        r.number_of_rows
+	   FROM sqlite_master m
 LEFT OUTER JOIN pragma_table_info(m.name) p
-						   ON m.name <> p.name
-			  LEFT JOIN row_count AS r
-						   ON m.name = r.table_name
-				   WHERE m.type = 'table'
-		     GROUP BY m.name;
+	     ON m.name <> p.name
+      LEFT JOIN row_count AS r
+             ON m.name = r.table_name
+	  WHERE m.type = 'table'
+       GROUP BY m.name;
 		  
 -- 4. Write two queries to optimize product restocking.
 
@@ -62,13 +62,13 @@ LEFT OUTER JOIN pragma_table_info(m.name) p
 WITH
 
 prod_perf AS (
-		SELECT productCode,
-					   SUM (quantityOrdered) AS ordered,
-					   SUM (quantityOrdered * priceEach) AS product_sales
-		FROM orderdetails 
+		  SELECT productCode,
+		         SUM (quantityOrdered) AS ordered,
+		         SUM (quantityOrdered * priceEach) AS product_sales
+		    FROM orderdetails 
 		GROUP BY productCode
 		ORDER BY product_sales DESC
-		LIMIT 10
+		   LIMIT 10
 ),
 
 -- Note: the guided project specifically uses the 'low stock' criteria defined as the 10 products with the lowest SUM(quantityOrdered)/quantityInStock.
@@ -82,11 +82,11 @@ prod_perf AS (
 -- For the purpose of this project I will go with the 10 products with the highest SUM(quantityOrdered)/quantityInStock
 
 low_stock AS (
-		SELECT pp.productCode,
-					   ROUND(SUM(pp.ordered)/p.quantityInStock,2) AS low_stock_rate
-		FROM prod_perf pp
-		JOIN products p
-		ON p.productCode = pp.productCode
+		  SELECT pp.productCode,
+		         ROUND(SUM(pp.ordered)/p.quantityInStock,2) AS low_stock_rate
+		    FROM prod_perf pp
+		    JOIN products p
+		      ON p.productCode = pp.productCode
 		GROUP BY pp.productCode
 		ORDER BY low_stock_rate DESC
 		LIMIT 10
@@ -94,84 +94,84 @@ low_stock AS (
 			 
 -- Display the top performing products currently low-in-stock:
 			 
-		SELECT 	 ls.productCode,
-						 p.productName,
-						 p.productLine,
-						 ls.low_stock_rate,
-						 (SELECT pp.product_sales
-							  FROM prod_perf pp) AS product_sales
-		FROM low_stock ls
-		JOIN products p
+	       SELECT ls.productCode,
+		      p.productName,
+		      p.productLine,
+		      ls.low_stock_rate,
+	 	      (SELECT pp.product_sales
+			 FROM prod_perf pp) AS product_sales
+		 FROM low_stock ls
+		 JOIN products p
 		   ON ls.productCode = p.productCode
 		WHERE ls.productCode IN ( SELECT pp.productCode
-													   FROM prod_perf pp)
+					  FROM prod_perf pp)
 	
 -- 5. Write queries to optimize customer engagement
 -- Calculate profit per customer & determine their VIP vs least engaged status.
 
 WITH
 cust_profit AS (
-				  SELECT o.customerNumber, 
-								 SUM(od.quantityOrdered * (od.priceEach - p.buyPrice)) AS profit
-					  FROM products p
-LEFT OUTER JOIN orderdetails od
-						   ON p.productCode = od.productCode
-LEFT OUTER JOIN orders o
-						   ON od.orderNumber = o.orderNumber
-			 GROUP BY o.customerNumber
+		  SELECT o.customerNumber, 
+			 SUM(od.quantityOrdered * (od.priceEach - p.buyPrice)) AS profit
+		    FROM products p
+	 LEFT OUTER JOIN orderdetails od
+		      ON p.productCode = od.productCode
+	 LEFT OUTER JOIN orders o
+		      ON od.orderNumber = o.orderNumber
+		GROUP BY o.customerNumber
 ),
 			 
 cust_vip AS (
-			SELECT contactLastName,
-							contactFirstName,
-							city,
-							country,
-							profit
-				FROM cust_profit
-		LEFT JOIN customers c
-					 ON c.customerNumber = cust_profit.customerNumber
-	   ORDER BY profit DESC
+		SELECT  contactLastName,
+			contactFirstName,
+			city,
+			country,
+			profit
+		  FROM cust_profit
+	     LEFT JOIN customers c
+		    ON c.customerNumber = cust_profit.customerNumber
+	      ORDER BY profit DESC
 ),
 
 cust_least    AS (
-			SELECT contactLastName,
-							contactFirstName,
-							city,
-							country,
-							profit
-				FROM cust_profit
-		LEFT JOIN customers c
-					 ON c.customerNumber = cust_profit.customerNumber
-			 WHERE contactFirstName IS NOT NULL
-	   ORDER BY profit ASC
+		SELECT  contactLastName,
+			contactFirstName,
+			city,
+			country,
+			profit
+	          FROM cust_profit
+	     LEFT JOIN customers c
+		    ON c.customerNumber = cust_profit.customerNumber
+		 WHERE contactFirstName IS NOT NULL
+   	      ORDER BY profit ASC
 )				 
 
 -- Top 5 VIP customers:
 	   
-	SELECT * 
-	FROM cust_vip
-	LIMIT 5;
+SELECT * 
+  FROM cust_vip
+ LIMIT 5;
 
 -- Top 5 least engaged customers:
 	
-	SELECT * 
-	FROM cust_least
-	LIMIT 5;
+SELECT * 
+  FROM cust_least
+ LIMIT 5;
 	
 -- 6. Analyze the number of new customers arriving each month
 
 WITH
 
 payment_with_year_month_table AS (
-		SELECT *, 
-						CAST(SUBSTR(paymentDate, 1,4) AS INTEGER)*100 + CAST(SUBSTR(paymentDate, 6,7) AS INTEGER) AS year_month
-		   FROM payments p
+	SELECT *, 
+	       CAST(SUBSTR(paymentDate, 1,4) AS INTEGER)*100 + CAST(SUBSTR(paymentDate, 6,7) AS INTEGER) AS year_month
+	  FROM payments p
 ),
 
 customers_by_month_table AS (
 	  SELECT p1.year_month, COUNT(*) AS number_of_customers, SUM(p1.amount) AS total
-          FROM payment_with_year_month_table p1
- GROUP BY p1.year_month
+	    FROM payment_with_year_month_table p1
+	GROUP BY p1.year_month
 ),
 
 new_customers_by_month_table AS (
@@ -193,14 +193,27 @@ SELECT p1.year_month,
 
 -- Display how many new customers & how much sales came from new customers, against total customers & total sales, on a monthly basis
 
-SELECT year_month, 
-				ROUND(number_of_new_customers*100/number_of_customers,1) AS pct_number_of_new_customers,
-				ROUND(new_customer_sales_total*100/sales_total,1) AS pct_new_customers_sales_total
+  SELECT year_month, 
+	 ROUND(number_of_new_customers*100/number_of_customers,1) AS pct_number_of_new_customers,
+	 ROUND(new_customer_sales_total*100/sales_total,1) AS pct_new_customers_sales_total
     FROM new_customers_by_month_table;
   
 -- 7. Write a query to compute the Customer Lifetime Value (LTV), or the average amount of money generated per customer.
 
 -- Based on the cust_profit CTE:
 
-	SELECT AVG(profit) as avg_profit
-	FROM cust_profit cp
+SELECT AVG(profit) as avg_profit
+  FROM cust_profit cp
+  
+-- Conclusion:
+
+-- Q4's list suggests that classic cars are profitable products with high turnover, which should be prioritized for restocking 
+
+-- Q5's list of VIP customers and least engaged customers may suggest a different approach & goal to the Marketing department.
+-- VIP customers are likely to be receptive to campaigns aiming to boost loyalty & find upsell opportunities,
+-- whereas least engaged customers are least likely to place repeat orders and may switch to competitors, due to finding lack of value from the partnership.
+
+-- Q6's pct_number_of_new_customers and pct_new_customers_sales_total suggest that the company has not brought in new customer since Dec 2004 
+-- and that new customers make up less and less proportion in terms of number of customers and product sales.
+-- If we decide to launch a program on acquiring new customers, the cost of our customer acquisition should be benchmarked against the LTV, 
+-- which is suggested to be $ 39,039.6 in average.
