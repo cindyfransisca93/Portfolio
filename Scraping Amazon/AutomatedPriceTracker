@@ -29,11 +29,11 @@ def check_price():
         
 check_price()
 
-# while(True):
-  #  check_price()
-  #  time.sleep(86400)
+while(True):
+  check_price()
+  time.sleep(86400)
 
 # But for efficiency purpose we will just view the data on this interfact
 import pandas as pd
-df = pd.read_csv(r'/Users/cindyfransisca/Documents/Github/lbai/Projects/Cindy/scraping_amazon/MonsteraPriceTracker.csv')
+df = pd.read_csv(r'/Users/.../MonsteraPriceTracker.csv')
 print(df)
