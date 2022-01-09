@@ -1,12 +1,8 @@
-## 
-
-Guided Project: Web Scraping with Python
-Source: https://github.com/AlexTheAnalyst, with multiple modifications
-Goal: To create an automated web scraping tool that tracks a monstera plant's listing price on Amazon.
-Modules used: BeautifulSoup, requests, datetime, csv
-Code written in: Python 3.8
-
-##
+## Guided Project: Web Scraping with Python
+## Source: https://github.com/AlexTheAnalyst, with multiple modifications
+## Goal: To create an automated web scraping tool that tracks a monstera plant's listing price on Amazon.
+## Modules used: BeautifulSoup, requests, datetime, csv
+## Code written in: Python 3.8
 
 from bs4 import BeautifulSoup
 import requests
